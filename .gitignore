@@ -8,6 +8,7 @@
 !*.md
 !Pipfile
 !Pipfile.lock
+!*.png
 
 # ... even if they are in subdirectories
 !*/ 
