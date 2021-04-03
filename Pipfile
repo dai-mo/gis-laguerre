@@ -9,6 +9,7 @@ numpy = "*"
 scipy = "*"
 matplotlib = "*"
 pyqt5 = "*"
+geopandas = "*"
 
 [dev-packages]
 autopep8 = "*"

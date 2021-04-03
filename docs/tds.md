@@ -11,13 +11,21 @@ Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an 
 ![image.png](../images/laguerre-voronoi-example.png)
 
 ## Laguerre Voronoi Tessellation of DHS Data
-Due to the nature of the degradation introduced in the DHS Data, Laguerre Voronoi tessellation of the DHS dataset is a viable model to use to create polygonal 
-
+Due to the nature of the degradation introduced in the DHS Data, Laguerre Voronoi tessellation of the DHS dataset is a viable model to create polygonal partition of the map of a country for further data analysis. India is taken as an example for introducing the pipeline.
+### Preprocessing DHS Data
+Note that the intersection of 0 degrees latitude (Equator) and 0 degrees longitude(Prime Meridian) on the map falls in the middle of the 
+Atlantic Ocean, in the Gulf of Guinea off the coast of western Africa.
+![image.png](../images/0N0E.png)
+<figcaption>
+The image is from <a href="#ref3">[3]</a>.
+</figcaption>
+Hence all entries from any country specific DHS GeoDataFrame could be dropped which has both latitude and longitude entries are 0.0.
 
 ## Acknowledgements
 ## References
 <ol>
     <li is="ref1">Imai, H., Iri, M. & Murota, K.(1985). Voronoi Diagram in the Laguerre Geometry and Its Applications, SIAM Journal of Computing, 14(1), 93--105. doi:10.1137/0214006</li>
-    <li is="ref2"> Geospatial Covariates: Proxies for Mapping Urban-Related Indicators. https://dhsprogram.com/pubs/pdf/SAR19/SAR19.pdf</li>
+    <li is="ref2"> Guidelines On The Use of DHS GPS Data https://dhsprogram.com/pubs/pdf/SAR8/SAR8.pdf</li>
+    <li is="ref3"> What is at Zero Degrees Latitude and Zero Degrees Longitude? https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/</li>
     
 </ol>
