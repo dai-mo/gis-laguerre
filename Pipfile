@@ -10,6 +10,7 @@ scipy = "*"
 matplotlib = "*"
 pyqt5 = "*"
 geopandas = "*"
+python-dotenv = "*"
 
 [dev-packages]
 autopep8 = "*"
