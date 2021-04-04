@@ -13,8 +13,7 @@ Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an 
 ## Laguerre Voronoi Tessellation of DHS Data
 Due to the nature of the degradation introduced in the DHS Data, Laguerre Voronoi tessellation of the DHS dataset is a viable model to create polygonal partition of the map of a country for further data analysis. India is taken as an example for introducing the pipeline.
 ### Preprocessing DHS Data
-Note that the intersection of 0 degrees latitude (Equator) and 0 degrees longitude(Prime Meridian) on the map falls in the middle of the 
-Atlantic Ocean, in the Gulf of Guinea off the coast of western Africa.
+- Note that the intersection of 0 degrees latitude (Equator) and 0 degrees longitude(Prime Meridian) on the map falls in the middle of the Atlantic Ocean, in the Gulf of Guinea off the coast of western Africa.
 
 <figure>
     <img 
@@ -24,9 +23,57 @@ Atlantic Ocean, in the Gulf of Guinea off the coast of western Africa.
 </figure>
 Hence all entries from any country specific DHS GeoDataFrame could be dropped which has both latitude and longitude entries are 0.0.
 
-```Python
+```python
+class DHSGeographicData():
+    """Class representing the DHS geographic dataset
+    """
+
+    def __init__(self, filename: str):
+        try:
+            self.country_gdf = gpd.read_file(filename)
+        except fiona.errors.DataIOError as err:
+            raise TypeError
+
+    def clean(self):
+        """Drops all rows with longitude = 0.0 and latitude = 0.0 as they are not valid for land data.
+        """
+        self.country_cleaned_gdf = self.country_gdf.loc[(
+            self.country_gdf['LATNUM'] != 0.0) & (self.country_gdf['LONGNUM'] != 0.0)]
 
 ```
+- Next extract the columns important for computation of the Laguerre-Voronoi diagrams using the method [`DHSGeographicData.extract_dhs()`]("https://github.com/dai-mo/gis-laguerre/blob/master/src/dhs_data.py")
+Using the shapefile `IAGE71FL.shp` for India from geographic data [IAGE71FL.zip](https://dhsprogram.com/data/dataset/India_Standard-DHS_2015.cfm) after extraction, the following geodataframe is obtained:
+![image.png](../images/india_extracted_gdf.png) 
+![image.png](../images/india_extracted_plot.png) 
+
+- Then assign the weights to the different sites depending on whether they are _urban_ or _rural_ and extract the sites and weights using the method [`DHSGeographicData.get_sites_and_radii()`]("https://github.com/dai-mo/gis-laguerre/blob/master/src/dhs_data.py").
+
+### Generate the Weighted Voronoi
+Using the [Laguerre-Voronoi GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
+the weighted Voronoi tessellation is obtained using
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+import dhs_data as dd
+import laguerre_voronoi_2d as lv2d
+import matplotlib.pyplot as plt 
+
+dhs_geo_file = os.environ.get("DHS_DATA_DIR") + "/IAGE71FL_geographic_data/IAGE71FL.shp"
+dhs_geo_data = dd.DHSGeographicData(dhs_geo_file)
+dhs_geo_data.clean()
+dhs_geo_data.extract_dhs()
+(sites, weights) = dhs_geo_data.get_sites_and_radii()
+tri_list, vor_vert = lv2d.get_power_triangulation(sites, weights)
+voronoi_cell_map = lv2d.get_voronoi_cells(sites, vor_vert, tri_list)
+```
+A plot of the weighted Voronoi tessellation of the DHS cluster for India:
+![image.png](../images/weighted_voronoi_india.png)
+
+
+
+
 
 ## Acknowledgements
 ## References
