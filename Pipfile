@@ -11,6 +11,8 @@ matplotlib = "*"
 pyqt5 = "*"
 geopandas = "*"
 python-dotenv = "*"
+joblib = "*"
+tqdm = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -2,6 +2,7 @@ import geopandas as gpd
 import fiona
 import itertools
 import numpy as np
+from shapely.geometry import Polygon, MultiPoint
 
 
 class DHSGeographicData():
@@ -27,7 +28,7 @@ class DHSGeographicData():
             'DHSID', 'DHSCLUST', 'ADM1DHS', 'DHSREGCO', 'DHSREGNA', 'URBAN_RURA', 'LATNUM', 'LONGNUM', 'ALT_DEM', 'DATUM', 'geometry']]
 
     def get_sites_and_radii(self):
-        """Prepare country_extracted geodataframe for voronoi cell computation. 
+        """Prepare country_extracted geodataframe for voronoi cell computation.
         """
         # Add another column to country_extracted_gdf to represent the weights for weighted voronoi computation.
         # Using the approximate formula where 1 degree Latitude = 111 km we have:
@@ -53,3 +54,38 @@ class DHSGeographicData():
     def coord_lister_of_point_series(self, geom):
         coords = list(geom.coords)
         return (coords)
+
+    def is_array_in_list(self, array, list_of_arrays):
+        for a in list_of_arrays:
+            if np.array_equal(array, a):
+                return True
+        return False
+
+    def get_shapely_polygons(self, voronoi_cell_map):
+        polygons_lst = []
+        for key in voronoi_cell_map:
+            value = voronoi_cell_map[key]
+            # Convert value to polygon
+            poly = []
+            for edge, (A, U, tmin, tmax) in value:
+                if tmin == -np.Inf:
+                    tmin = -10.0
+                if tmax == np.Inf:
+                    tmax = 10.0
+                pt_lft = A + tmin * U
+                pt_rt = A + tmax * U
+                if not self.is_array_in_list(pt_lft, poly) and np.isfinite(pt_lft).all():
+                    poly.append(list(pt_lft))
+                if not self.is_array_in_list(pt_rt, poly) and np.isfinite(pt_rt).all():
+                    poly.append(list(pt_rt))
+
+        if len(poly) > 0:
+            poly_shp = Polygon(np.array(poly))
+            if poly_shp.is_valid:
+                polygons_lst.append(poly_shp)
+            else:
+                # clip polygon with boundary
+                pts = MultiPoint(poly_shp.exterior.coords[1:])
+                chull = pts.convex_hull
+                polygons_lst.append(chull)
+        return polygons_lst
