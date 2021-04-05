@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "80ea40db4414a44a2c1da10855bd4bdb5f955943096522dc177e3767327baac3"
+            "sha256": "54eb01c13e72c496ade4084f87f80b3847c94ba1b71756a17f5ae535b2b2687b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -187,6 +187,7 @@
                 "sha256:c64cc0bab040c3a2aec12edd2e1407e3b52609117d9a9a471e3d25172abb1e5e",
                 "sha256:e34612996121a66559fac9013fd30d8200ed17df54c71edf63461a8b6f519cf5"
             ],
+            "index": "pypi",
             "version": "==1.8.18"
         },
         "geopandas": {

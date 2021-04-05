@@ -71,6 +71,32 @@ voronoi_cell_map = lv2d.get_voronoi_cells(sites, vor_vert, tri_list)
 A plot of the weighted Voronoi tessellation of the DHS cluster for India:
 ![image.png](../images/weighted_voronoi_india.png)
 
+### Combine DHS data with Voronoi cells
+Next the DHS GeoDataFrame is combined with the voronoi cells, such that every point in the DHS cluster is assigned exactly one voronoi cell. The aim is to create a new ESRI shapefile where the geometry consists of the voronoi cells. The member method `DHSGeographicData.combine_dhs_voronoi(poly_lst)` is used for this
+```python
+def combine_dhs_voronoi(self, poly_lst):
+        self.ctry_dhs_weighted_voronoi = self.country_extracted_gdf
+        p = self.ctry_dhs_weighted_voronoi.shape[0]
+        voronois = list(np.zeros(p))
+        for i in tqdm(range(p)):
+            pt = self.ctry_dhs_weighted_voronoi.loc[self.ctry_dhs_weighted_voronoi.index[i], 'geometry']
+            for poly in poly_lst:
+                if poly.contains(pt):
+                    if voronois[i] == 0.0:
+                        voronois[i] = poly
+                        break
+                    else:
+                        print("cell not empty")
+
+        self.ctry_dhs_weighted_voronoi['cells'] = voronois
+        # drop geometry column and rename cells as geometry.
+        self.ctry_dhs_weighted_voronoi = self.ctry_dhs_weighted_voronoi.drop(columns=[
+                                                                             'geometry'], axis=1)
+        self.ctry_dhs_weighted_voronoi = self.ctry_dhs_weighted_voronoi.rename(columns={
+                                                                               'cells': 'geometry'})
+
+```
+
 
 
 

@@ -1,8 +1,10 @@
 import geopandas as gpd
+import pandas as pd
 import fiona
 import itertools
 import numpy as np
 from shapely.geometry import Polygon, MultiPoint
+from tqdm import tqdm
 
 
 class DHSGeographicData():
@@ -33,8 +35,9 @@ class DHSGeographicData():
         # Add another column to country_extracted_gdf to represent the weights for weighted voronoi computation.
         # Using the approximate formula where 1 degree Latitude = 111 km we have:
         # 2 km = 0.018018 degrees and 5 km = 0.045045 degrees.
-        self.country_extracted_gdf['WEIGHT'] = [
-            0.018018 if x == 'U' else 0.045045 for x in self.country_extracted_gdf['URBAN_RURA']]
+        weights = [0.018018 if x ==
+                   'U' else 0.04505 for x in self.country_extracted_gdf['URBAN_RURA']]
+        self.country_extracted_gdf['WEIGHT'] = weights
 
         # extract all the points as list from geoseries
         coords = self.country_extracted_gdf.geometry.apply(
@@ -45,9 +48,7 @@ class DHSGeographicData():
         npsites = np.array([np.array(si) for si in sites_list])
 
         # extract all weights as list from panda.coreseries
-        weights = self.country_extracted_gdf.WEIGHT
-        weights_list = weights.to_list()
-        npweights = np.array(weights_list)
+        npweights = np.array(weights)
 
         return (npsites, npweights)
 
@@ -79,13 +80,34 @@ class DHSGeographicData():
                 if not self.is_array_in_list(pt_rt, poly) and np.isfinite(pt_rt).all():
                     poly.append(list(pt_rt))
 
-        if len(poly) > 0:
-            poly_shp = Polygon(np.array(poly))
-            if poly_shp.is_valid:
-                polygons_lst.append(poly_shp)
-            else:
-                # clip polygon with boundary
-                pts = MultiPoint(poly_shp.exterior.coords[1:])
-                chull = pts.convex_hull
-                polygons_lst.append(chull)
+            if len(poly) > 0:
+                poly_shp = Polygon(np.array(poly))
+                if poly_shp.is_valid:
+                    polygons_lst.append(poly_shp)
+                else:
+                    # clip polygon with boundary
+                    pts = MultiPoint(poly_shp.exterior.coords[1:])
+                    chull = pts.convex_hull
+                    polygons_lst.append(chull)
         return polygons_lst
+
+    def combine_dhs_voronoi(self, poly_lst):
+        self.ctry_dhs_weighted_voronoi = self.country_extracted_gdf
+        p = self.ctry_dhs_weighted_voronoi.shape[0]
+        voronois = list(np.zeros(p))
+        for i in tqdm(range(p)):
+            pt = self.ctry_dhs_weighted_voronoi.loc[self.ctry_dhs_weighted_voronoi.index[i], 'geometry']
+            for poly in poly_lst:
+                if poly.contains(pt):
+                    if voronois[i] == 0.0:
+                        voronois[i] = poly
+                        break
+                    else:
+                        print("cell not empty")
+
+        self.ctry_dhs_weighted_voronoi['cells'] = voronois
+        # drop geometry column and rename cells as geometry.
+        self.ctry_dhs_weighted_voronoi = self.ctry_dhs_weighted_voronoi.drop(columns=[
+                                                                             'geometry'], axis=1)
+        self.ctry_dhs_weighted_voronoi = self.ctry_dhs_weighted_voronoi.rename(columns={
+                                                                               'cells': 'geometry'})

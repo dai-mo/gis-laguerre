@@ -27,40 +27,16 @@ def main():
     # Compute voronoi polygonal list
     poly_lst = dhs_geo_data.get_shapely_polygons(voronoi_cell_map)
     # Combine
-    country_dhs_voronoi_gdf = dhs_geo_data.country_extracted_gdf
-    country_dhs_voronoi_gdf = country_dhs_voronoi_gdf.reindex(
-        columns=['DHSID', 'DHSCLUST', 'DHSREGNA', 'URBAN_RURA', 'LATNUM', 'LONGNUM', 'DATUM', 'geometry', 'cells'])
-    country_dhs_voronoi_gdf['cells'] = 0
-    manager = mp.Manager()
-    voronois = manager.list(np.zeros(country_dhs_voronoi_gdf.shape[0]))
-
-    def processInput(i):
-        pt = country_dhs_voronoi_gdf.loc[i, 'geometry']
-        for poly in poly_lst:
-            if poly.contains(pt):
-                if voronois[i] == 0:
-                    voronois[i] = poly
-                    return i
-                else:
-                    print("cell not empty.")
-
-    num_cores = mp.cpu_count()
-    p = country_dhs_voronoi_gdf.shape[0]
-    inputs = range(p)
-    results = Parallel(n_jobs=num_cores)(delayed(processInput)(i)
-                                         for i in tqdm(inputs))
-
-    # Add voronois list to dataframe cell
-    country_dhs_voronoi_gdf['cells'] = voronois
+    dhs_geo_data.combine_dhs_voronoi(poly_lst)
 
     # Write to files
     # write to csv
-    dhs_geo_data.country_voronoi_gdf.to_csv(os.environ.get(
-        "OUT_DIR") + "/india_dhs_weighted_voronoi.csv")
+    dhs_geo_data.ctry_dhs_weighted_voronoi.to_csv(os.environ.get(
+        "OUT_DIR") + "/IAGE71FL_Voronoi.csv")
 
     # write to shapefile
-    dhs_geo_data.country_voronoi_gdf.to_file(os.environ.get(
-        "OUT_DIR") + "/india_dhs_weighted_voronoi.shp")
+    dhs_geo_data.ctry_dhs_weighted_voronoi.to_file(os.environ.get(
+        "OUT_DIR") + "/IAGE71FL_Voronoi.shp")
 
 
 if __name__ == "__main__":

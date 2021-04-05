@@ -13,6 +13,7 @@ geopandas = "*"
 python-dotenv = "*"
 joblib = "*"
 tqdm = "*"
+fiona = "*"
 
 [dev-packages]
 autopep8 = "*"
