@@ -29,6 +29,13 @@ Change directory
       
     $ cd gis-laguerre
 
+Create the `.env` file with the following entries
+```
+DHS_DATA_DIR = "<path_to_dhs_data>"
+GADM_DATA_DIR = "<path_to_gadm_36_country_boundary_shapefile>"
+OUT_DIR = "<path_to_output_directory>"
+```
+
 Set up the environment for the project   
 
     $ pipenv shell
