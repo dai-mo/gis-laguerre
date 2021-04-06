@@ -138,6 +138,7 @@ The images below show the DHA and Voronoi combined GeoDataFrame clipped at the c
 - I would like to thank [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project.  
 - Kathleen Buckingham & Rong Fang of the [World Resources Institute](https://www.wri.org/) 
 - [Carlos Mougan](https://www.solveforgood.org/user/1590) of the Solve For Good Team.
+  
 ## References
 <ol>
     <li is="ref1">Imai, H., Iri, M. & Murota, K.(1985). Voronoi Diagram in the Laguerre Geometry and Its Applications, SIAM Journal of Computing, 14(1), 93--105. doi:10.1137/0214006</li>
