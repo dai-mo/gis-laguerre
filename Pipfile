@@ -14,6 +14,7 @@ python-dotenv = "*"
 joblib = "*"
 tqdm = "*"
 fiona = "*"
+rtree = "*"
 
 [dev-packages]
 autopep8 = "*"

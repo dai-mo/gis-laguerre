@@ -1,10 +1,11 @@
+from tqdm import tqdm
+from shapely.geometry import Polygon, MultiPoint
+import numpy as np
+import itertools
 import geopandas as gpd
 import pandas as pd
 import fiona
-import itertools
-import numpy as np
-from shapely.geometry import Polygon, MultiPoint
-from tqdm import tqdm
+fiona.supported_drivers
 
 
 class DHSGeographicData():
@@ -36,7 +37,7 @@ class DHSGeographicData():
         # Using the approximate formula where 1 degree Latitude = 111 km we have:
         # 2 km = 0.018018 degrees and 5 km = 0.045045 degrees.
         weights = [0.018018 if x ==
-                   'U' else 0.04505 for x in self.country_extracted_gdf['URBAN_RURA']]
+                   'U' else 0.04504 for x in self.country_extracted_gdf['URBAN_RURA']]
         self.country_extracted_gdf['WEIGHT'] = weights
 
         # extract all the points as list from geoseries

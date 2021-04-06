@@ -7,7 +7,7 @@ A pipeline for cleaning and transforming the DHS data is proposed along with the
 DHS surveys contain confidential information that could potentially be used to identify an individual through unique information. To avoid this the [DHS Program](https://dhsprogram.com/) has developed an approach to degrade accuracy of the GPS coordinates so that true place of residence cannot be derived. In all DHS surveys the center GPS coordinate of the populated place in a cluster is recorded and separate degradation error values are applied depending on whether a cluster is _urban_ or _rural_. A random error of 5 km maximum in rural areas and 2 km maximum in urban areas is applied, this decreases the likelihood of household identification by tenfold. The new list of coordinates can be thought of as having a circular error buffer zone of (5km or 2km) within which the actual value resides. This degradation poses a challenge for further data analysis and machine learning tasks on this data.
 
 ## Laguerre Voronoi Diagrams
-Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for $n$ points in the plane to that of Laguerre geometry for $n$ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
+Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for $n$ points in the plane to that of Laguerre geometry for $n$ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the following [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
 ![image.png](../images/laguerre-voronoi-example.png)
 
 ## Laguerre Voronoi Tessellation of DHS Data
@@ -21,7 +21,7 @@ Due to the nature of the degradation introduced in the DHS Data, Laguerre Vorono
     alt="Intersection.">
     <figcaption>Image from <a href="ref3">[3]</a> showing intersection of Equator and Prime Meridian.</figcaption>
 </figure>
-Hence all entries from any country specific DHS GeoDataFrame could be dropped which has both latitude and longitude entries are 0.0.
+Hence all entries from any country specific DHS GeoDataFrame can be dropped which have both latitude and longitude entries as 0.0.
 
 ```python
 class DHSGeographicData():
@@ -41,8 +41,8 @@ class DHSGeographicData():
             self.country_gdf['LATNUM'] != 0.0) & (self.country_gdf['LONGNUM'] != 0.0)]
 
 ```
-- Next extract the columns important for computation of the Laguerre-Voronoi diagrams using the method [`DHSGeographicData.extract_dhs()`]("https://github.com/dai-mo/gis-laguerre/blob/master/src/dhs_data.py")
-Using the shapefile `IAGE71FL.shp` for India from geographic data [IAGE71FL.zip](https://dhsprogram.com/data/dataset/India_Standard-DHS_2015.cfm) after extraction, the following geodataframe is obtained:
+- Next extract the columns important for computation of the Laguerre-Voronoi diagrams using the method [`DHSGeographicData.extract_dhs()`]("https://github.com/dai-mo/gis-laguerre/blob/master/src/dhs_data.py").
+The shapefile `IAGE71FL.shp` for India from geographic data [IAGE71FL.zip](https://dhsprogram.com/data/dataset/India_Standard-DHS_2015.cfm) is used for extraction and the following `GeoDataFrame` is obtained:
 ![image.png](../images/india_extracted_gdf.png) 
 ![image.png](../images/india_extracted_plot.png) 
 
@@ -72,7 +72,7 @@ A plot of the weighted Voronoi tessellation of the DHS cluster for India:
 ![image.png](../images/weighted_voronoi_india.png)
 
 ### Combine DHS data with Voronoi cells
-Next the DHS GeoDataFrame is combined with the voronoi cells, such that every point in the DHS cluster is assigned exactly one voronoi cell. The aim is to create a new ESRI shapefile where the geometry consists of the voronoi cells. The member method `DHSGeographicData.combine_dhs_voronoi(poly_lst)` is used for this
+Next the DHS GeoDataFrame is combined with the voronoi cells, such that every point in the DHS cluster is assigned exactly one voronoi cell. The aim is to create a new ESRI shapefile where the geometry is made up of the voronoi cells. The member method `DHSGeographicData.combine_dhs_voronoi(poly_lst)` is used for this
 ```python
 def combine_dhs_voronoi(self, poly_lst):
         self.ctry_dhs_weighted_voronoi = self.country_extracted_gdf
@@ -97,15 +97,52 @@ def combine_dhs_voronoi(self, poly_lst):
 
 ```
 
-
-
+### Clip the combined DHS and Voronoi cells GeoDataFrame with GADM country outline
+The [GADM](https://gadm.org/about.html) website is used for downloading country specific maps and spatial data. In the final step the combined `GeoDataFrame` of DHS data and Vornoi cells is clipped with the country boundary shapefile downloaded from GADM. The following steps were used for clipping the GeoDataFrame and storing the 
+final output into a shapefile for further use.
+```python
+dhs_geo_file = os.environ.get("DHS_DATA_DIR") + "/IAGE71FL_geographic_data/IAGE71FL.shp"
+dhs_geo_data = dd.DHSGeographicData(dhs_geo_file)
+dhs_geo_data.clean()
+dhs_geo_data.extract_dhs()
+# get the sites and weights for creating weighted Vornoi
+(sites, weights) = dhs_geo_data.get_sites_and_radii()
+tri_list, vor_vert = lv2d.get_power_triangulation(sites, weights)
+# Compute the Voronoi cells
+voronoi_cell_map = lv2d.get_voronoi_cells(sites, vor_vert, tri_list)
+poly_lst = dhs_geo_data.get_shapely_polygons(voronoi_cell_map)
+# Combine DHS data with DHS GeoDataFrame
+dhs_geo_data.combine_dhs_voronoi(poly_lst)
+# GADM Boundary shapefile for India
+gadm_file = os.environ.get("GADM_DATA_DIR") + "/gadm36_IND_0.shp"
+# Output files.
+gadm_simplified_file = os.environ.get("OUT_DIR") + "/gadm36_IND_0_simplified.shp"
+india_voronoi_clipped_file = os.environ.get("OUT_DIR") + "/IAGE71FL_Voronoi_Clipped.shp"
+# Clipping Process
+final_gdf = dhs_geo_data.ctry_dhs_weighted_voronoi.copy()
+final_gdf.crs = "EPSG:4326"
+final_gdf.to_file(os.environ.get("OUT_DIR") + "/IAGE71FL_Voronoi.shp", driver = 'ESRI Shapefile')
+india_bdry = gpd.read_file(gadm_file)
+# Simplify boundary for faster computation
+simplified_india_bdry = india_bdry.simplify(0.01, preserve_topology=True)
+india_weighted_voronoi_clipped = gpd.clip(final_gdf, simplified_india_bdry.geometry)
+```
+All the steps of the process can be found in [dhs_data_voronoi.ipynb](https://github.com/dai-mo/gis-laguerre/blob/master/examples/dhs_data_voronoi.ipynb).
+The images below show the DHA and Voronoi combined GeoDataFrame clipped at the country boundary.
+![image.png](../images/weighted_voronoi_india_clipped.png)
+![image.png](../images/weighted_voronoi_india_clipped_2.png)
 
 
 ## Acknowledgements
+- This work was done as part of the [Solve For Good](https://www.solveforgood.org/proj/47/) project: Creating a well-being data layer using machine learning, satellite imagery and ground-truth data.
+- I would like to thank [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project.  
+- Kathleen Buckingham & Rong Fang of the [World Resources Institute](https://www.wri.org/) 
+- [Carlos Mougan](https://www.solveforgood.org/user/1590) of the Solve For Good Team.
 ## References
 <ol>
     <li is="ref1">Imai, H., Iri, M. & Murota, K.(1985). Voronoi Diagram in the Laguerre Geometry and Its Applications, SIAM Journal of Computing, 14(1), 93--105. doi:10.1137/0214006</li>
     <li is="ref2"> Guidelines On The Use of DHS GPS Data https://dhsprogram.com/pubs/pdf/SAR8/SAR8.pdf</li>
     <li is="ref3"> What is at Zero Degrees Latitude and Zero Degrees Longitude? https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/</li>
+    <li is="ref4"> GitHub Gist by Devert Alexandre on [Laguerre Vornoi Diagrams](https://gist.github.com/marmakoide/45d5389252683ae09c2df49d0548a627)
     
 </ol>
