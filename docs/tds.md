@@ -7,7 +7,7 @@ A pipeline for cleaning and transforming the DHS data is proposed along with the
 DHS surveys contain confidential information that could potentially be used to identify an individual through unique information {{ The technical jargon for this is PII - https://en.wikipedia.org/wiki/Personal_data }}. To avoid this the [DHS Program](https://dhsprogram.com/) has developed an approach to degrade accuracy of the GPS coordinates so that true place of residence cannot be derived. In all DHS surveys the center GPS coordinate of the populated place in a cluster is recorded and separate degradation error values are applied depending on whether a cluster is _urban_ or _rural_. A random error of 5 km maximum in rural areas and 2 km maximum in urban areas is applied, this decreases the likelihood of household identification by tenfold. The new list of coordinates can be thought of as having a circular error buffer zone of (5km or 2km) within which the actual value resides. This degradation poses a challenge for further data analysis and machine learning tasks on this data. {{ Maybe introduce very briefly the problem you are trying to solve here }}
 
 ## Laguerre Voronoi Diagrams
-Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for $n$ points in the plane to that of Laguerre geometry for $n$ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the following [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
+Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for $n$ {{ Why $n$ and not simply n ? }} points in the plane to that of Laguerre geometry for $n$ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the following [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
 ![image.png](../images/laguerre-voronoi-example.png)
 
 ## Laguerre Voronoi Tessellation of DHS Data
@@ -132,6 +132,7 @@ The images below show the DHA and Voronoi combined GeoDataFrame clipped at the c
 ![image.png](../images/weighted_voronoi_india_clipped.png)
 ![image.png](../images/weighted_voronoi_india_clipped_2.png)
 
+{{ Definitely need some kind of conclusion or summary section which provides an explanation on why this solution is interesting / useful for this particular use case, i.e. how does it stand out from other solutions. Also some ideas on where lese this approach can be used would be great }}
 
 ## Acknowledgements
 - This work was done as part of the [Solve For Good](https://www.solveforgood.org/proj/47/) project: Creating a well-being data layer using machine learning, satellite imagery and ground-truth data.
