@@ -96,7 +96,11 @@ Please refer to the list of [contributors] who participated in this project.
 
 # Acknowledgments
 Thanks to,
-* 
+*  the [Solve For Good](https://www.solveforgood.org/proj/47/) project: Creating a well-being data layer using machine learning, satellite imagery and ground-truth data.
+*  [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project. 
+*  [Kathleen Buckingham](https://www.wri.org/profile/kathleen-buckingham) & [Rong Fang](https://www.wri.org/profile/rong-fang) of the [World Resources Institute](https://www.wri.org/) 
+*  [Carlos Mougan](https://cmougan.github.io/) of the Solve For Good Team.
+*  GitHub Gist by Devert Alexandre on [Laguerre Vornoi Diagrams](https://gist.github.com/marmakoide/45d5389252683ae09c2df49d0548a627)
 
 
 [Semantic Versioning]:http://semver.org/
