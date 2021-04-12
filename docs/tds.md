@@ -4,10 +4,10 @@ In this article the application of Laguerre-Vornoi tessellation to Demographic a
 A pipeline for cleaning and transforming the DHS data is proposed along with the associated python code.
 
 ## Demographic and Health Survey data
-DHS surveys contain confidential information that could potentially be used to identify an individual through unique information {{ The technical jargon for this is PII - https://en.wikipedia.org/wiki/Personal_data }}. To avoid this the [DHS Program](https://dhsprogram.com/) has developed an approach to degrade accuracy of the GPS coordinates so that true place of residence cannot be derived. In all DHS surveys the center GPS coordinate of the populated place in a cluster is recorded and separate degradation error values are applied depending on whether a cluster is _urban_ or _rural_. A random error of 5 km maximum in rural areas and 2 km maximum in urban areas is applied, this decreases the likelihood of household identification by tenfold. The new list of coordinates can be thought of as having a circular error buffer zone of (5km or 2km) within which the actual value resides. This degradation poses a challenge for further data analysis and machine learning tasks on this data. {{ Maybe introduce very briefly the problem you are trying to solve here }}
+DHS surveys contain confidential information that could potentially be used to identify an individual through unique information or [PII](https://en.wikipedia.org/wiki/Personal_data). To avoid this the [DHS Program](https://dhsprogram.com/) has developed an approach to degrade accuracy of the GPS coordinates so that true place of residence cannot be derived. In all DHS surveys the center GPS coordinate of the populated place in a cluster is recorded and separate degradation error values are applied depending on whether a cluster is _urban_ or _rural_. A random error of 5 km maximum in rural areas and 2 km maximum in urban areas is applied, this decreases the likelihood of household identification by tenfold. The new list of coordinates can be thought of as having a circular error buffer zone of (5km or 2km) within which the actual value resides. This degradation poses a challenge for further data analysis and machine learning tasks on this data. Comprehensive and accurate measurements of economic well-being are fundamental inputs into both research and policy making. The final goal of the [World Resources Institute Project](https://www.solveforgood.org/proj/47/) is to be able to predict Demographic and Health Survey based estimates with Remote Sensing and OpenStreetMaps data for finest spatial microregions in India.
 
 ## Laguerre Voronoi Diagrams
-Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for $n$ {{ Why $n$ and not simply n ? }} points in the plane to that of Laguerre geometry for $n$ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the following [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
+Introduced in 1985 in <a href="#ref1">[1]</a>, Laguerre Voronoi diagrams are an extension of the concept of Voronoi diagrams for _n_ points in the plane to that of Laguerre geometry for _n_ circles in the plane. It is a partition of the Euclidean plane into polygonal cells defined from a set of circles and are also known as [Power Diagrams](https://en.wikipedia.org/wiki/Power_diagram). The diagrams used in this article were generated from the following [GitHub Gist](https://gist.github.com/sunayana/a3a564058e97752f726ca65d56fab529)
 ![image.png](../images/laguerre-voronoi-example.png)
 
 ## Laguerre Voronoi Tessellation of DHS Data
@@ -132,13 +132,18 @@ The images below show the DHA and Voronoi combined GeoDataFrame clipped at the c
 ![image.png](../images/weighted_voronoi_india_clipped.png)
 ![image.png](../images/weighted_voronoi_india_clipped_2.png)
 
-{{ Definitely need some kind of conclusion or summary section which provides an explanation on why this solution is interesting / useful for this particular use case, i.e. how does it stand out from other solutions. Also some ideas on where lese this approach can be used would be great }}
+## Conclusion 
+Spatial partitioning is the process of dividing a geographic area into a finite number of non-overlapping areas based on given set of constraints such as spatial attributes, e.g., physical or human geographic factors, for an overview of existing methods we refer to <a href="ref5">[5]</a>. Weighted Voronoi is an example of a spatial partitioning method. Voronoi Diagrams are widely used to deal with human geographic problems. Some of the applications of Voronoi diagrams are in public facilities optimization, urban planning and zone design. [In ecology](http://wiki.gis.com/wiki/index.php/Voronoi_diagram#Applications), Voronoi Diagrams are used to study the growth patterns of forests and forest canopies and may also help be helpful in developing predictive models for forest fires. The reason behind using weighted Voronoi diagrams for this project is due to the fact that spatial structure of some social and economic variables are a reflection of the fact that high varaible values tend to concentrate near other high values and low values appear in geographical proximity to each other. Future work will show whether this approach is indeed useful in predicting the social and economic well-being.
+
+## About Me
+My expertise lies in the areas of Computational Geometry and Geometry Processing and Software Development in C++ and Python. Currently I am developing my skills in the areas of Machine Learning related to Geospatial Computing and exploring the applications of geometry in either of these areas. I look forward to potential collaborations in this field related to socially relevant projects. You can connect with me on [LinkedIn](https://www.linkedin.com/in/sunayanag/) and [Medium](https://medium.com/@sunayanag/about)
 
 ## Acknowledgements
 - This work was done as part of the [Solve For Good](https://www.solveforgood.org/proj/47/) project: Creating a well-being data layer using machine learning, satellite imagery and ground-truth data.
-- I would like to thank [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project.  
-- Kathleen Buckingham & Rong Fang of the [World Resources Institute](https://www.wri.org/) 
-- [Carlos Mougan](https://www.solveforgood.org/user/1590) of the Solve For Good Team.
+- I would like to thank:
+  -  [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project.  
+  - [Kathleen Buckingham](https://www.wri.org/profile/kathleen-buckingham) & [Rong Fang](https://www.wri.org/profile/rong-fang) of the [World Resources Institute](https://www.wri.org/) 
+  - [Carlos Mougan](https://cmougan.github.io/) of the Solve For Good Team.
   
 ## References
 <ol>
@@ -146,5 +151,6 @@ The images below show the DHA and Voronoi combined GeoDataFrame clipped at the c
     <li is="ref2"> Guidelines On The Use of DHS GPS Data https://dhsprogram.com/pubs/pdf/SAR8/SAR8.pdf</li>
     <li is="ref3"> What is at Zero Degrees Latitude and Zero Degrees Longitude? https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/</li>
     <li is="ref4"> GitHub Gist by Devert Alexandre on [Laguerre Vornoi Diagrams](https://gist.github.com/marmakoide/45d5389252683ae09c2df49d0548a627)
+    <li is="ref5"> Wang, J., Kwan, M.-P., & Ma, L. (2014). Delimiting service area using adaptive crystal-growth Voronoi diagrams based on weighted planes: A case study in Haizhu District of Guangzhou in China. Applied Geography, 50, 108–119. doi:10.1016/j.apgeog.2014.03.001 </li>
     
 </ol>
