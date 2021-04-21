@@ -143,7 +143,7 @@ My expertise lies in the areas of Computational Geometry, Geometry Processing an
 - I would like to thank:
   -  [Gijs van den Dool](https://www.linkedin.com/in/gvddool/) for extensive discussions related to Voronoi Diagrams and their use in GIS which finally led to weighted Voronoi Diagrams being used for this project.  
   - [Kathleen Buckingham](https://www.wri.org/profile/kathleen-buckingham) & [Rong Fang](https://www.wri.org/profile/rong-fang) of the [World Resources Institute](https://www.wri.org/) 
-  - [Carlos Mougan](https://cmougan.github.io/) of the Solve For Good Team.
+  - [Carlos Mougan](https://cmougan.github.io/) & [Rohaan Nadeem](https://www.linkedin.com/in/rohaan-nadeem/?originalSubdomain=pk) of the Solve For Good Team.
   
 ## References
 <ol>
